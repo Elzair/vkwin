@@ -12,55 +12,62 @@ struct vkwininfo_t vkwinCreateWindow(int16_t x,
                                      int16_t y,
                                      uint16_t width,
                                      uint16_t height) {
-  // Create info struct
-  struct vkwininfo_t info;
-  info.x = x;
-  info.y = y;
-  info.width = width;
-  info.height = height;
 
 #if defined(__linux__)
   // Open connection to X server
-  info.conn   = xcb_connect(NULL, NULL);
-
-  info.depth  = XCB_COPY_FROM_PARENT;
+  xcb_connection_t* conn = xcb_connect(NULL, NULL);
 
   // Get first screen
-  const xcb_setup_t*    setup  = xcb_get_setup(info.conn);
+  const xcb_setup_t*    setup  = xcb_get_setup(conn);
   xcb_screen_iterator_t iter   = xcb_setup_roots_iterator(setup);
   xcb_screen_t*         screen = iter.data;
   
   // Get new ID for window
-  info.winid  = xcb_generate_id(info.conn);
+  xcb_window_t winid = xcb_generate_id(conn);
 
   // Set parent window to root window
-  info.parent = screen->root;
+  xcb_window_t parent = screen->root;
 
   // Set other window properties
-  info.bwidth = 10;
-  info._class = XCB_WINDOW_CLASS_INPUT_OUTPUT;
-  info.visual = screen->root_visual;
-  info.vmask  = 0;
-  info.vlist  = NULL;
+  uint16_t       border_width = 10;
+  uint8_t        depth        = XCB_COPY_FROM_PARENT;
+  uint16_t       _class       = XCB_WINDOW_CLASS_INPUT_OUTPUT;
+  xcb_visualid_t visual       = screen->root_visual;
+  uint32_t       value_mask   = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
+  uint32_t       value_list[32];
+  value_list[0] = screen->black_pixel;
+  value_list[1] = XCB_EVENT_MASK_KEY_RELEASE      |
+                  XCB_EVENT_MASK_EXPOSURE         |
+                  XCB_EVENT_MASK_STRUCTURE_NOTIFY |
+                  XCB_EVENT_MASK_POINTER_MOTION   |
+                  XCB_EVENT_MASK_BUTTON_PRESS     |
+                  XCB_EVENT_MASK_BUTTON_RELEASE;
 
   // Create window
-  xcb_create_window(info.conn,
-                    info.depth,
-                    info.winid,
-                    info.parent,
-                    info.x,
-                    info.y,
-                    info.width,
-                    info.height,
-                    info.bwidth,
-                    info._class,
-                    info.visual,
-                    info.vmask,
-                    info.vlist);
+  xcb_create_window(conn,
+                    depth,
+                    winid,
+                    parent,
+                    x,
+                    y,
+                    width,
+                    height,
+                    border_width,
+                    _class,
+                    visual,
+                    value_mask,
+                    value_list);
 
   // Map window onto screen
-  xcb_map_window(info.conn, info.winid);
+  xcb_map_window(conn, winid);
 #endif
+
+  struct vkwininfo_t info = {
+    x, y, width, height
+#if defined(__linux__)
+    , border_width, conn, depth, winid, parent
+#endif
+  };
 
   return info;
 }

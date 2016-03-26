@@ -15,10 +15,11 @@ extern "C" {
    * to which Vulkan will output.
    */
   struct vkwininfo_t {
-    int16_t          x;
-    int16_t          y;
-    uint16_t         width;
-    uint16_t         height;
+    int16_t           x;
+    int16_t           y;
+    uint16_t          width;
+    uint16_t          height;
+    uint16_t          bwidth;
 
 // Linux specific options
 #if defined(__linux__)
@@ -26,11 +27,6 @@ extern "C" {
     uint8_t           depth;
     xcb_window_t      winid;
     xcb_window_t      parent;
-    uint16_t          bwidth;
-    uint16_t          _class;
-    xcb_visualid_t    visual;
-    uint32_t          vmask;
-    uint32_t*         vlist;
 #endif
 
   };
