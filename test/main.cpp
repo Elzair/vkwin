@@ -3,9 +3,7 @@
 #include <vkwin/vkwin.h>
 
 int main() {
-  vkwininfo_t info = vkwinCreateWindow(0, 0, 150, 150);
-
-  xcb_flush(info.conn);
+  vkwininfo_t info = vkwinCreateWindow(150, 150);
 
   pause();
 

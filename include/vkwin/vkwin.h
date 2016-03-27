@@ -1,42 +1,24 @@
 #ifndef __VKWIN_H__
 #define __VKWIN_H__
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
-#endif
-
-// Include platform specific headers
-#if defined(__linux__)
-#include <xcb/xcb.h>
 #endif
 
   /**
    * This structure holds information about the window
    * to which Vulkan will output.
    */
-  struct vkwininfo_t {
-    int16_t           x;
-    int16_t           y;
-    uint16_t          width;
-    uint16_t          height;
-    uint16_t          bwidth;
+  typedef struct vkwininfo {
+    uint8_t data[32];
+  } vkwininfo_t;
 
-// Linux specific options
-#if defined(__linux__)
-    xcb_connection_t* conn;
-    uint8_t           depth;
-    xcb_window_t      winid;
-    xcb_window_t      parent;
-#endif
+  vkwininfo_t vkwinCreateWindow(uint16_t width,
+                                uint16_t height);
 
-  };
-
-  struct vkwininfo_t vkwinCreateWindow(int16_t x,
-                                       int16_t y,
-                                       uint16_t width,
-                                       uint16_t height);
-
-  void vkwinDestroyWindow(struct vkwininfo_t* info);
+  void vkwinDestroyWindow(vkwininfo_t* info);
 #ifdef __cplusplus
 }
 #endif
