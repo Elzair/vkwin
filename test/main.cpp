@@ -1,15 +1,15 @@
 #include <unistd.h>
+#if defined(__linux__)
 #include <xcb/xcb.h>
-#include <vkwin/vkwin.h>
+#endif
+#include <vkwin/vkwin.hpp>
 
 int main() {
-  vkwininfo_t info = vkwinCreateWindow(0, 0, 150, 150);
-
-  xcb_flush(info.conn);
-
+#if defined(__linux__)
+  VKWin::LinuxInfo lininfo(150, 150);
+  lininfo.flush();
   pause();
-
-  vkwinDestroyWindow(&info);
+#endif
 
   return 0;
 }
